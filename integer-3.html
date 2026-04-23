@@ -221,14 +221,11 @@
             selectedBtn.classList.add('wrong');
             isFirstTry = false;
             
-            let prompt = "";
-            if (currentB > currentA) {
-                prompt = `提示： $${currentB} > ${currentA}$，計算：$${currentB} - ${currentA} = ?$`;
-            } else if (currentA > currentB) {
-                prompt = `提示：$${currentA} > ${currentB}$，計算：$-( ${currentA} - ${currentB} ) = ?$`;
-            } else {
-                prompt = `提示：$${currentA} = ${currentB}$，計算：$${currentA} - ${currentB} = ?$`;
-            }
+            // 計算 b - a 的結果
+            let result = currentB - currentA;
+            
+            // 統一修改後的提示
+            let prompt = `提示：因為 $ +${currentB} - ${currentA} = ${result}$，所以 $ -${currentA} + ${currentB} = ? $`;
 
             document.getElementById('q-feedback').innerHTML = prompt;
             // 隱藏確認按鈕，待學生選新答案後再出現
