@@ -21,6 +21,7 @@
             --success-color: #4caf50;
             --error-color: #f44336;
             --bg-color: #f5f7fa;
+            --selected-color: #ff9800;
         }
         body {
             font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
@@ -45,8 +46,18 @@
             -webkit-tap-highlight-color: transparent;
         }
         .btn:disabled { cursor: not-allowed; opacity: 0.8; }
-        .correct { background: var(--success-color) !important; color: white; border-color: var(--success-color); }
-        .wrong { background: var(--error-color) !important; color: white; border-color: var(--error-color); }
+        
+        /* 選中狀態樣式 */
+        .selected { background: var(--selected-color) !important; color: white !important; border-color: var(--selected-color) !important; }
+        
+        .correct { background: var(--success-color) !important; color: white !important; border-color: var(--success-color); }
+        .wrong { background: var(--error-color) !important; color: white !important; border-color: var(--error-color); }
+        
+        #confirm-btn {
+            margin-top: 1.5rem; padding: 1rem; background: #333;
+            color: white; border: none; border-radius: 50px; font-size: 1.1rem;
+            display: none; width: 100%; cursor: pointer;
+        }
         #next-btn {
             margin-top: 1.5rem; padding: 1rem; background: var(--primary-color);
             color: white; border: none; border-radius: 50px; font-size: 1.1rem;
@@ -72,7 +83,7 @@
 
 <div class="container" id="start-screen">
     <h2>苗栗大同國中資源中心</h2>
-    <h3>$a - (-b) = a + b =?$</h3>
+    <h3>練習五：$a - (-b) = a + b$</h3>
     <button class="btn" style="background: var(--primary-color); color: white; width: 100%;" onclick="startQuiz()">開始練習</button>
     <div id="qrcode-container">
         <div id="qrcode"></div>
@@ -93,6 +104,7 @@
         <div class="options-grid" id="options-container"></div>
     </div>
 
+    <button id="confirm-btn" onclick="checkAnswer()">確認答案</button>
     <button id="next-btn" onclick="generateQuestion()">下一題</button>
 </div>
 
@@ -109,6 +121,8 @@
     let questionCount = 0;
     let totalScore = 0;
     let isFirstTry = true;
+    let selectedValue = null;
+    let selectedBtn = null;
 
     function startQuiz() {
         document.getElementById('start-screen').style.display = 'none';
@@ -129,15 +143,16 @@
         questionCount++;
         document.getElementById('question-number').innerText = `第 ${questionCount} 題 / 共 10 題`;
         isFirstTry = true;
+        selectedValue = null;
+        selectedBtn = null;
         document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('confirm-btn').style.display = 'none';
         document.getElementById('q-feedback').innerText = '';
         document.getElementById('options-container').innerHTML = '';
 
-        // 設定範圍
         currentA = getRandomInt(-20, 20);
         currentB = getRandomInt(1, 20);
 
-        // 題目顯示格式：a - (-b)
         document.getElementById('question-box').innerHTML = `$$ ${currentA} - (-${currentB}) $$`;
 
         setupOptions();
@@ -146,17 +161,15 @@
 
     function setupOptions() {
         const container = document.getElementById('options-container');
-        // 核心邏輯：a - (-b) = a + b
         let resultValue = currentA + currentB;
 
         let choiceSet = new Set();
         choiceSet.add(resultValue);
         
-        // 常見錯誤干擾項設計
-        choiceSet.add(currentA - currentB);     // 忽略負負得正，直接當作 a-b
-        choiceSet.add(-currentA + currentB);    // 符號弄錯
-        choiceSet.add(-(currentA + currentB));  // 結果取負
-        choiceSet.add(currentA + (-currentB));  // 另一種符號混淆
+        choiceSet.add(currentA - currentB);     
+        choiceSet.add(-currentA + currentB);    
+        choiceSet.add(-(currentA + currentB));  
+        choiceSet.add(currentA + (-currentB));  
         
         while(choiceSet.size < 4) {
             let offset = getRandomInt(-3, 3);
@@ -167,24 +180,42 @@
             const btn = document.createElement('button');
             btn.className = 'btn'; btn.innerHTML = `$${val}$`;
             btn.onclick = () => {
-                if (parseInt(val) === resultValue) {
-                    btn.classList.add('correct');
-                    if (isFirstTry) totalScore += 10;
-                    container.querySelectorAll('.btn').forEach(b => b.disabled = true);
-                    document.getElementById('next-btn').style.display = 'block';
-                } else {
-                    btn.classList.add('wrong');
-                    isFirstTry = false;
-                    
-                    // 教學提示邏輯：負負得正
-                    let simplifyText = `提示：$${currentA} - (-${currentB}) = ${currentA} + ${currentB} = ?$`;
-                    
-                    document.getElementById('q-feedback').innerHTML = simplifyText;
-                    MathJax.typesetPromise();
-                }
+                if (document.getElementById('next-btn').style.display === 'block') return;
+
+                container.querySelectorAll('.btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedValue = parseInt(val);
+                selectedBtn = btn;
+                document.getElementById('confirm-btn').style.display = 'block';
             };
             container.appendChild(btn);
         });
+    }
+
+    function checkAnswer() {
+        if (selectedValue === null) return;
+
+        let resultValue = currentA + currentB;
+        const container = document.getElementById('options-container');
+
+        if (selectedValue === resultValue) {
+            selectedBtn.classList.remove('selected');
+            selectedBtn.classList.add('correct');
+            if (isFirstTry) totalScore += 10;
+            container.querySelectorAll('.btn').forEach(b => b.disabled = true);
+            document.getElementById('confirm-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'block';
+            document.getElementById('q-feedback').innerText = '';
+        } else {
+            selectedBtn.classList.remove('selected');
+            selectedBtn.classList.add('wrong');
+            isFirstTry = false;
+            
+            let simplifyText = `提示：$${currentA} - (-${currentB}) = ${currentA} + ${currentB} = ?$`;
+            document.getElementById('q-feedback').innerHTML = simplifyText;
+            document.getElementById('confirm-btn').style.display = 'none';
+            MathJax.typesetPromise();
+        }
     }
 
     function showResult() {
