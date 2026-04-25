@@ -233,7 +233,11 @@
             
             if (currentN === 0) {
                 hint += "若$a\\neq{0}$，則$a^{0} = 1$";
-            } else {
+            } 
+            else if (currentN === 1) {
+                hint += "次方$1$，省略不寫。";
+            }
+            else {
                 let items = Array(currentN).fill(currentA);
                 switch(type) {
                     case 0: multiplier = items.join(' \\times '); break;
