@@ -143,17 +143,44 @@
         document.getElementById('q-feedback').innerText = '';
         document.getElementById('options-container').innerHTML = '';
 
-        // 除法題目生成邏輯：先決定「商」與「除數」，反求「被除數」確保整除
-        // 商：11~99 (二位數), 除數：2~9 (一位數)，並控制被除數不超過 300
+        // --- 修改後的邏輯：質數的倍數 ---
+        
+        // 1. 定義 100 以內的質數 (排除過小的 2, 3, 5 以增加難度，或根據需求保留)
+        const primes = [7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
+        
         let valid = false;
-        let targetQuotient;
         while (!valid) {
-            targetQuotient = getRandomInt(11, 99) * (Math.random() > 0.5 ? 1 : -1);
-            currentB = getRandomInt(2, 9) * (Math.random() > 0.5 ? 1 : -1);
-            currentA = targetQuotient * currentB;
-            if (Math.abs(currentA) <= 300 && Math.abs(currentA) > 20) valid = true;
+            // 隨機選一個質數
+            let p = primes[getRandomInt(0, primes.length - 1)];
+            // 隨機決定倍數，確保被除數 < 100 且 > 10
+            let multiplier = getRandomInt(2, Math.floor(99 / p));
+            currentA = p * multiplier;
+            
+            // 2. 決定除數：找被除數的因數且 < 10
+            let factors = [];
+            for (let i = 2; i < 10; i++) {
+                if (currentA % i === 0) factors.push(i);
+            }
+            
+            // 如果有符合條件的除數，隨機選一個
+            if (factors.length > 0) {
+                currentB = factors[getRandomInt(0, factors.length - 1)];
+                valid = true;
+            }
         }
 
+        // 3. 隨機賦予正負號
+        if (Math.random() > 0.5) currentA *= -1;
+        if (Math.random() > 0.5) currentB *= -1;
+
+        if (currentA > 0 && currentB > 0) {
+            if (Math.random() < 0.8) {
+                if (Math.random() > 0.5) currentA *= -1;
+                if (Math.random() > 0.5) currentB *= -1;
+            }
+        }
+
+        // 格式化顯示
         let displayB = currentB < 0 ? `(${currentB})` : currentB;
         document.getElementById('question-box').innerHTML = `$$ ${currentA} \\div ${displayB} $$`;
 
