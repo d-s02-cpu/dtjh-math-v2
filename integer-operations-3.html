@@ -169,7 +169,7 @@
         let cStr = currentC < 0 ? `(${currentC})` : `${currentC}`;
 
         // 修改處：算式位置互換 c +/- a * b
-        let mathML = `${cStr} ${currentOp} ${aStr} \\times ${bStr}`;
+        let mathML = `${currentC} ${currentOp} ${aStr} \\times ${bStr}`;
 
         document.getElementById('question-box').innerHTML = `$$ ${mathML} $$`;
         setupOptions();
@@ -234,7 +234,7 @@
             let rDisplay = currentA * currentB < 0 ? `(${currentA * currentB})` : `${currentA * currentB}`;
             
             // 修改處：提示文字引導先算後方的乘法
-            feedbackEl.innerHTML = `提示：先算 $ ${aDisplay} \\times ${bDisplay} = ${currentA * currentB} $，再算$ ${cDisplay} ${currentOp} ${rDisplay} = ?$`;
+            feedbackEl.innerHTML = `提示：先算 $ ${aDisplay} \\times ${bDisplay} = ${currentA * currentB} $，再算$ ${currentC} ${currentOp} ${rDisplay} = ?$`;
             
             MathJax.typesetPromise([feedbackEl]);
             document.getElementById('confirm-btn').style.display = 'none';
