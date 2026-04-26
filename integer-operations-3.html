@@ -230,10 +230,11 @@
             
             let aDisplay = currentA < 0 ? `(${currentA})` : `${currentA}`;
             let bDisplay = currentB < 0 ? `(${currentB})` : `${currentB}`;
-            let cDisplay = currentC < 0 ? `${currentC}` : `+${currentC}`;
+            let cDisplay = currentC < 0 ? `(${currentC})` : `${currentC}`;
+            let rDisplay = currentA * currentB < 0 ? `(${currentA * currentB})` : `${currentA * currentB}`;
             
             // 修改處：提示文字引導先算後方的乘法
-            feedbackEl.innerHTML = `提示：先算 $ ${currentOp} ${aDisplay} \\times ${bDisplay} $，再算$ ${cDisplay} $`;
+            feedbackEl.innerHTML = `提示：先算 $ ${aDisplay} \\times ${bDisplay} = ${currentA * currentB} $，再算$ ${cDisplay} ${currentOp} ${rDisplay} = ?$`;
             
             MathJax.typesetPromise([feedbackEl]);
             document.getElementById('confirm-btn').style.display = 'none';
