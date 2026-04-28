@@ -151,6 +151,12 @@
         document.getElementById('options-container').innerHTML = '';
 
         currentA = getRandomInt(-20, 20);
+        if (currentA === 0) {
+            if (Math.random() < 0.8) {
+                currentA = getRandomInt(-20, 20);
+            }
+        }
+        
         currentB = getRandomInt(1, 20);
 
         document.getElementById('question-box').innerHTML = `$$ ${currentA} - (-${currentB}) $$`;
