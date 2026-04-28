@@ -145,6 +145,12 @@
 
         // 邏輯：先決定商(target)和除數(B)，反推被除數(A)，確保整除
         let targetAns = getRandomInt(-10, 10);
+        if (targetAns === 0) {
+            if (Math.random() < 0.8) {
+                targetAns = getRandomInt(-10, 10);
+            }
+        }
+        
         currentB = 0;
         while(currentB === 0) {
             currentB = getRandomInt(-10, 10);
